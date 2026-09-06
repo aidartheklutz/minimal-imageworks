@@ -23,6 +23,7 @@ from sepia import register_sepia_handlers
 from palette import register_palette_handlers
 from replace_color import register_replace_color_handlers
 from shakalization import register_shakalization_handlers
+from alt_text import register_describe_handlers
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -49,6 +50,7 @@ register_sepia_handlers(bot)
 register_palette_handlers(bot)
 register_replace_color_handlers(bot)
 register_shakalization_handlers(bot)
+register_describe_handlers(bot)
 
 
 @bot.message_handler(commands=["start"])
@@ -57,9 +59,10 @@ def start(message):
         "<b>Добро пожаловать в Minimal Imageworks!</b> \n"
         "Выберите нужную вам функцию, отправив одну из команд ниже. После этого просто следуйте инструкциям.\n\n"
 
-        "<b>Разделение и создание</b>\n"
+        "<b>Инструменты</b>\n"
         "✱ /split – делит картинку на равные части по вертикали или горизонтали\n"
         "✱ /qr – создаёт QR-код из текста или ссылки\n"
+        "✱ /describe – описывает, что изображено на картинке\n"
         "\n"
 
         "<b>Размер и положение</b>\n"

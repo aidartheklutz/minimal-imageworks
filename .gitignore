@@ -16,3 +16,6 @@ secrets.py
 htmlcov/
 
 .idea/
+describe_usage.json
+hf_auth.py
+hf_auth_state.json
