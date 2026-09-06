@@ -21,6 +21,7 @@ Users interact with the bot through simple commands. Most tools follow the same 
 
 - `/split` – Divides an image into equal parts vertically or horizontally.
 - `/qr` – Generates a QR code from text or a link. Supports standard black/white or custom fill/background colors via HEX codes.
+- `/describe` – Sends the photo to a vision model and returns a short Russian caption of what is in the image (5 uses per user every 12 hours).
 
 **Size & position**
 
@@ -58,9 +59,69 @@ Any unrecognized message or media falls back to the welcome message that lists a
 - **pyTelegramBotAPI** (TeleBot) – Telegram Bot API wrapper
 - **Pillow** – Image loading, manipulation, and saving
 - **qrcode** – QR code generation
-- **python-dotenv** – Loading the bot token from environment variables
+- **python-dotenv** – Loading secrets from environment variables
+- **requests** – Hugging Face Inference API calls for `/describe`
 
 The project is organized into small focused modules (one per feature) that register their own handlers, plus shared helpers for loading/sending images and parsing user input.
+
+## Setting up `/describe`
+
+Image captions are generated in `alt_text.py` through the [Hugging Face Inference Router](https://huggingface.co/docs/inference-providers). On your machine:
+
+1. Create a Hugging Face account and generate an access token at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
+2. Put the token in a `.env` file in the project root (this file is gitignored):
+
+```
+BOT_TOKEN=your_telegram_bot_token
+HF_TOKEN=hf_your_token_here
+```
+
+3. Install dependencies, including `requests`.
+4. Add a `query` function that posts the chat-completions payload. `alt_text.py` imports it as `from hf_auth import query`, so create `hf_auth.py` in the project root with that function. Example:
+
+```python
+import os
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")
+API_URL = "https://router.huggingface.co/v1/chat/completions"
+
+def query(payload):
+    headers = {
+        "Authorization": f"Bearer {HF_TOKEN}",
+    }
+    response = requests.post(API_URL, headers=headers, json=payload, timeout=90)
+    return response.json()
+
+response = query({
+    "messages": [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Describe this image in one sentence."
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": "https://cdn.britannica.com/61/93061-050-99147DCE/Statue-of-Liberty-Island-New-York-Bay.jpg"
+                    }
+                }
+            ]
+        }
+    ],
+    "model": "Qwen/Qwen3.8-27B:ovhcloud"
+})
+
+print(response["choices"][0]["message"])
+```
+
+`alt_text.py` calls `query(...)` with the captioning prompt and the user's photo as a `data:image/jpeg;base64,...` URL instead of a public image link.
+
+Each user can run `/describe` up to 5 times per 12 hours. There is no server-side database: usage is stored locally in `describe_usage.json` in the project root (the file is gitignored). The JSON object maps each Telegram user ID to a list of Unix timestamps for successful caption requests. On every check, timestamps older than 12 hours are dropped, so the limit is a rolling window rather than a calendar day. Failed API calls do not consume a use.
 
 ## License
 
