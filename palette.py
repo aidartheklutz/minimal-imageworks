@@ -27,6 +27,14 @@ def make_palette_image(colors):
     return img
 
 
+def format_palette_text(img):
+    colors = get_dominant_colors(img)
+    hex_list = []
+    for r, g, b in colors:
+        hex_list.append(f"#{r:02X}{g:02X}{b:02X}")
+    return "Основные цвета:\n" + "\n".join(hex_list)
+
+
 def register_palette_handlers(bot):
     @bot.message_handler(commands=["palette"])
     def start_palette(message):
@@ -41,10 +49,7 @@ def register_palette_handlers(bot):
         uid = message.from_user.id
         img = load_image(bot, message)
         colors = get_dominant_colors(img)
-        hex_list = []
-        for r, g, b in colors:
-            hex_list.append(f"#{r:02X}{g:02X}{b:02X}")
-        text = "Основные цвета:\n" + "\n".join(hex_list)
+        text = format_palette_text(img)
         send_image(bot, message.chat.id, make_palette_image(colors), title=TITLE)
         say(bot, message.chat.id, TITLE, text)
         user_data.pop(uid, None)

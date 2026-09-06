@@ -1,4 +1,5 @@
 from helpers import is_user_text, load_image, send_image, parse_hex, say
+from palette import format_palette_text
 
 TITLE = "Замена цвета"
 user_data = {}
@@ -30,9 +31,11 @@ def register_replace_color_handlers(bot):
     )
     def get_photo(message):
         uid = message.from_user.id
-        user_data[uid]["image"] = load_image(bot, message)
+        img = load_image(bot, message)
+        user_data[uid]["image"] = img
         user_data[uid]["waiting"] = "old_color"
-        say(bot, message.chat.id, TITLE, "Отправьте цвет, который нужно заменить, например: #FF0000")
+        text = format_palette_text(img) + "\n\nОтправьте цвет, который нужно заменить, например: #FF0000"
+        say(bot, message.chat.id, TITLE, text)
 
     @bot.message_handler(
         func=lambda m: m.from_user.id in user_data
