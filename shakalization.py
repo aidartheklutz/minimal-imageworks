@@ -10,21 +10,25 @@ user_data = {}
 def shakalize(img, level):
     img = img.convert("RGB")
     w, h = img.size
-    scale = level + 1
-    small_w = max(8, w // scale)
-    small_h = max(8, h // scale)
-    img = img.resize((small_w, small_h), Image.Resampling.BILINEAR)
-    img = img.resize((w, h), Image.Resampling.NEAREST)
+    times = 3 + level * 2
+    quality = 30 - level * 4
+    if quality < 6:
+        quality = 6
+    small_w = max(64, w // (level + 1))
+    small_h = max(64, h // (level + 1))
 
-    quality = 40 - level * 7
-    if quality < 1:
-        quality = 1
-    for i in range(level):
+    img = img.resize((small_w, small_h), Image.Resampling.BILINEAR)
+    for i in range(times):
         buf = BytesIO()
-        img.save(buf, format="JPEG", quality=quality)
+        img.save(buf, format="JPEG", quality=quality, subsampling=2)
         buf.seek(0)
         img = Image.open(buf).convert("RGB")
-    return img
+
+    img = img.resize((w, h), Image.Resampling.BILINEAR)
+    buf = BytesIO()
+    img.save(buf, format="JPEG", quality=quality, subsampling=2)
+    buf.seek(0)
+    return Image.open(buf).convert("RGB")
 
 
 def register_shakalization_handlers(bot):
