@@ -1,6 +1,6 @@
 # Minimal Imageworks
 
-Minimal Imageworks is a lightweight Telegram bot for everyday image editing and generation. Send a photo (or text for QR codes), choose a command, and follow the guided steps. The bot processes the image with Pillow and returns the result directly in the chat.
+Minimal Imageworks is a lightweight Telegram bot for everyday image editing and generation. Choose a command, send a photo (or text for QR codes), and follow the guided steps. The bot processes the image with Pillow and returns the result directly in the chat.
 
 The live bot is available at [t.me/imgworks_bot](https://t.me/imgworks_bot).
 
