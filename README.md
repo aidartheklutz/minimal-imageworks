@@ -21,7 +21,7 @@ Users interact with the bot through simple commands. Most tools follow the same 
 
 - `/split` – Divides an image into equal parts vertically or horizontally.
 - `/qr` – Generates a QR code from text or a link. Supports standard black/white or custom fill/background colors via HEX codes.
-- `/describe` – Sends the photo to a vision model and returns a short Russian caption of what is in the image (5 uses per user every 12 hours).
+- `/describe` – Sends the photo to a vision model (Qwen3.8-27B) and returns a short Russian caption of what is in the image (5 uses per user every 12 hours).
 
 **Size & position**
 
