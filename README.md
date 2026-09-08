@@ -17,7 +17,7 @@ Users interact with the bot through simple commands. Most tools follow the same 
 
 ### Available commands
 
-**Splitting & creation**
+**Tools**
 
 - `/split` – Divides an image into equal parts vertically or horizontally.
 - `/qr` – Generates a QR code from text or a link. Supports standard black/white or custom fill/background colors via HEX codes.
